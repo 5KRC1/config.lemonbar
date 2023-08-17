@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#
+# dunst-history first pops all notifications from history (or as many specified)
+# and removes them from history once they get back there, since they will likely
+# already have been read.
+#
+
+# pop all notifs in history
+for ((i=0 ; i <= $1 ; i++));
+do
+  dunstctl history-pop
+done
+
+# wait and clear all notifs
+x=$1
+while [[ $x -gt 0 ]];
+do
+  cleared_count=$(dunstctl count | tail -1 | cut -d: -f2 | cut -d" " -f2) && dunstctl history-clear
+  x=$(($(($x)) - $(($cleared_count))))
+  sleep 5
+done

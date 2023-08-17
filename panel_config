@@ -1,0 +1,64 @@
+#! /bin/bash
+
+# Lemonbar Variables
+PANEL_FIFO=/tmp/panel-fifo
+export PANEL_FIFO
+PANEL_RES=1920x24
+PANEL_FONT="-*-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
+PANEL_FONT_ICON="Font Awesome 6 Free"
+FALLBACK_FONT="Font Awesome 6 Brands"
+FALLBACK_FONT_2="Font Awesome 6 Free Solid"
+PANEL_WM_NAME=bspwm_panel
+
+# Hardware Info
+BT_DEVICE=""
+WIFI_DEVICE=""
+ETH_DEVICE=""
+BAT_NAME=""
+MONITOR=""
+
+TERMINAL=""
+
+if [[ $(xrandr -q | grep "$MONITOR connected") ]];
+then
+	PANEL_OFFSET=1920
+	MONITOR=1
+else
+	PANEL_OFFSET=0
+	MONITOR=0
+fi
+
+
+# Icons
+# notif
+I_BELL="\uf0f3"
+I_BELL_CROSSED="\uf1f6"
+
+# battery
+I_PLUG="\uf0e7"
+I_BAT_FULL="\uf240"
+I_BAT_3QUARTERS="\uf241"
+I_BAT_HALF="\uf242"
+I_BAT_QUARTER="\uf243"
+I_BAT_EMPTY="\uf244"
+
+# volume
+I_MUTED="\uf6a9"
+I_VOL_MAX="\uf026"
+I_VOL_MED="\uf027"
+I_VOL_MIN="\uf028"
+
+# cpu
+I_CPU="\uf2db"
+
+# ram
+I_RAM="\uf538"
+
+# network
+I_WIFI="\uf1eb"
+I_ETH="\uf796"
+I_NET_NONE="\uf057"
+
+# bluetooth
+I_BT_OFF="\uf294"
+I_BT_ON="\uf293"

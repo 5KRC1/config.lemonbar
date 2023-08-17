@@ -1,0 +1,49 @@
+#! /bin/sh
+
+. $HOME/.config/lemonbar/panel_config
+
+# colors
+if [[ $1 ]];
+then
+	. $HOME/.config/lemonbar/themes/$1
+else
+	. $HOME/.config/lemonbar/themes/default
+fi
+
+
+if xdo id -a "$PANEL_WM_NAME" > /dev/null ; then
+	printf "%s\n" "The panel is already running." >&2
+	exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+. $HOME/.config/lemonbar/panel_modules
+
+# updating values
+while true;
+do
+	Volume
+	Battery
+	Network
+	Notifications
+	Bluetooth
+	sleep 5
+done > "$PANEL_FIFO" &
+
+Window
+Displays
+Conky
+Trayer $(echo $COLOR_DEFAULT_BG | cut -d# -f2)
+
+$HOME/.config/lemonbar/panel_bar $1 < "$PANEL_FIFO" | lemonbar -a 32 -u 2 -n "$PANEL_WM_NAME" -g $PANEL_RES+$PANEL_OFFSET+0 -f "$PANEL_FONT" -f "$PANEL_FONT_ICON"-15 -f "$FALLBACK_FONT"-15 -f "$FALLBACK_FONT_2"-15 -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
+
+wid=$(xdo id -m -a "$PANEL_WM_NAME")
+xdo above -t "$(xdo id -N Bspwm -n root | sort | head -n 1)" "$wid"
+# adds trayer right on top of lemonbar
+xdo above -t $(xdo id -a bspwm_panel) $(xdo id -a panel)
+
+wait

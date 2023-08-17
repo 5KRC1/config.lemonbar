@@ -1,0 +1,124 @@
+#! /bin/bash
+
+. $HOME/.config/lemonbar/panel_config
+
+Notifications() {
+	notif_count=$(dunstctl count | tail -1 | cut -d: -f2 | cut -d" " -f2)
+	if [[ $(($notif_count)) -eq 0 ]];
+	then
+		icon=$I_BELL
+	else
+		icon=$I_BELL
+	fi
+	paused=$(dunstctl is-paused)
+	if [[ $paused == true ]];
+	then
+		icon=$I_BELL_CROSSED
+	fi
+	echo -e "D%{A:dunstctl set-paused toggle &:}$icon%{A} %{A:$HOME/.config/lemonbar/dunst-history $notif_count:}$notif_count%{A}"
+}
+
+Battery() {
+	# fully-charged/discharging/charging
+	charging=$(upower -i $BAT_NAME | grep "state" | grep -oE '[^ ]+$')
+	bat=$(($(upower -i $BAT_NAME | grep "percentage" | grep -oE '[^ ]+$' | cut -d% -f1)))
+
+	if [[ ${charging} == "charging" ]];
+	then
+		icon=$I_PLUG
+	else
+		if [[ bat -gt 80 ]];
+		then
+			icon=$I_BAT_FULL
+		elif [[ bat -gt 50 && bat -le 80 ]];
+		then
+			icon=$I_BAT_3QUARTERS
+		elif [[ bat -gt 20 && bat -le 50 ]];
+		then
+			icon=$I_BAT_HALF
+		elif [[ bat -gt 5 && bat -le 20 ]];
+		then
+			icon=$I_BAT_QUARTER
+		else
+			icon="%{F#fa8072}$I_BAT_EMPTY%{F-}"
+		fi
+	fi
+	echo -e "B%{A:$TERMINAL sudo powertop &:}$icon $bat %%%{A}"
+}
+
+Volume() {
+	# on=not muted/off=muted
+	not_muted=$(amixer sget Master | awk -F"[][]" '/Left:/ { print $4 }')
+	if [[ ${not_muted} == "off" ]];
+	then
+		icon=$I_MUTED
+	else
+		vol=$(($(amixer sget Master | awk -F"[][]" '/Left:/ { print $2 }' | cut -d% -f1)))
+		if [[ vol -le 33 ]];
+		then
+			icon=$I_VOL_MAX
+		elif [[ vol -gt 33 && vol -le 66 ]];
+		then
+			icon=$I_VOL_MED
+		else
+			icon=$I_VOL_MIN
+		fi
+	fi
+	echo -e "V%{A:pavucontrol &:}$icon $vol %%%{A}" > "$PANEL_FIFO" &
+}
+
+Network() {
+	# getting signal of network (wifi only)
+	# nmcli -t -f SSID,SIGNAL dev wifi list | grep "^Wireless-N:" | cut -d : -f 2	# requires manually set SSID
+	# nmcli -f IN-USE,SIGNAL device wifi | grep '*'	# gets connected network
+
+	# wifi/ethernet
+	con_type=$(nmcli -t -f TYPE device | head -1)
+	con_ssid=$(nmcli -t -f CONNECTION device | head -1)
+	set_nm_state="off"
+	case $con_type in
+		wifi*)
+			icon=$I_WIFI
+			;;
+		ethernet*)
+			icon=$I_ETH
+			;;
+		*)
+			icon=$I_NET_NONE
+			con_ssid=""
+			set_nm_state="on"
+			;;
+	esac
+
+	echo -e "N%{A:nmcli radio wifi $set_nm_state & && nmcli n $set_nm_state &:}$icon%{A} %{A:$TERMINAL nmtui &:}$con_ssid%{A}"
+}
+
+Bluetooth() {
+	running=$(hcitool dev | grep $BT_DEVICE)
+	if [[ $running == "" ]];
+	then
+		icon=$I_BT_OFF
+	else
+		icon=$I_BT_ON
+	fi
+	echo -e "C%{A:$TERMINAL bluetuith &:}$icon%{A}"
+}
+
+Window() {
+	xtitle -sf 'T%s\n' > "$PANEL_FIFO" &
+}
+
+Displays() {
+	bspc subscribe report > "$PANEL_FIFO" &
+}
+
+Conky() {
+	conky -c $HOME/.config/lemonbar/panel_conky > "$PANEL_FIFO" &
+}
+
+Trayer() {
+	killall -q trayer
+	trayer --edge top --align right --widthtype request --height 24 --tint 0x$1 --transparent true --expand true --SetDockType true --alpha 0 --monitor $MONITOR &
+	sleep .1
+	xprop -notype -name panel -f WM_SIZE_HINTS 32i ' $5\n' -spy WM_NORMAL_HINTS > "$PANEL_FIFO" &
+}
