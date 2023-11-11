@@ -28,7 +28,11 @@ while true;
 do
 	Volume
 	Battery
+<<<<<<< HEAD
 	Network
+=======
+	#Network
+>>>>>>> 026892e (readme)
 	Notifications
 	Bluetooth
 	sleep 5

@@ -11,6 +11,7 @@ FALLBACK_FONT_2="Font Awesome 6 Free Solid"
 PANEL_WM_NAME=bspwm_panel
 
 # Hardware Info
+<<<<<<< HEAD
 BT_DEVICE=""
 WIFI_DEVICE=""
 ETH_DEVICE=""
@@ -23,6 +24,26 @@ if [[ $(xrandr -q | grep "$MONITOR connected") ]];
 then
 	PANEL_OFFSET=1920
 	MONITOR=1
+=======
+BT_DEVICE="hci0"
+WIFI_DEVICE="wlo1"
+ETH_DEVICE="enp4s0"
+BAT_NAME="/org/freedesktop/UPower/devices/battery_BAT1"
+MONITOR="HDMI-0"
+
+TERMINAL="urxvt -e"
+
+if [[ $(xrandr -q | grep "$MONITOR connected") ]];
+then
+    SINGLE_MONITOR=`cat /tmp/single_monitor.txt`
+	MONITOR=1
+    if $SINGLE_MONITOR;
+    then
+        PANEL_OFFSET=0
+    else
+        PANEL_OFFSET=1920
+    fi
+>>>>>>> 026892e (readme)
 else
 	PANEL_OFFSET=0
 	MONITOR=0
