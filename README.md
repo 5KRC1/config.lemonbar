@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-# getting hardware info
-Wifi & ethernet: nmcli device
-bluetooth: hcitool dev
-battery: upower -e
-monitor: Xrandr -q | grep -a "connected"
-=======
 # Lemonbar configuration
 ---
 
@@ -30,4 +23,3 @@ part of ![bluez-utils-compat](https://aur.archlinux.org/packages/bluez-utils-com
 - ![trayer](https://man.archlinux.org/man/extra/trayer/trayer.1.en) (minimized apps)
 
 hcitool is deprecated and will have to be replacedhttps://man.archlinux.org/man/extra/trayer/trayer.1.en.
->>>>>>> 026892e (readme)
