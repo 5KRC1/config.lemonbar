@@ -22,4 +22,4 @@ part of ![bluez-utils-compat](https://aur.archlinux.org/packages/bluez-utils-com
 - ![bspwm](https://wiki.archlinux.org/title/Bspwm) (wm)
 - ![trayer](https://man.archlinux.org/man/extra/trayer/trayer.1.en) (minimized apps)
 
-hcitool is deprecated and will have to be replacedhttps://man.archlinux.org/man/extra/trayer/trayer.1.en.
+hcitool is deprecated and will have to be replaced
